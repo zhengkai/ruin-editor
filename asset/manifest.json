@@ -1,0 +1,71 @@
+{
+  "character": [
+    {
+      "name": "samurai",
+      "sprite": [
+        {
+          "pose": "walk",
+          "path": "character/samurai/walk.png",
+          "step": [10,10,10,12,14,16,10,10]
+        },
+        {
+          "pose": "run",
+          "path": "character/samurai/run.png",
+          "step": [10,10,10,12,14,16,10,10]
+        },
+        {
+          "pose": "attack1",
+          "path": "character/samurai/attack_1.png",
+          "step": [10,10,10,12,14,16]
+        },
+        {
+          "pose": "attack2",
+          "path": "character/samurai/attack_2.png",
+          "step": [10,10,10,12]
+        },
+        {
+          "pose": "attack3",
+          "path": "character/samurai/attack_3.png",
+          "step": [10,10,10]
+        },
+        {
+          "pose": "jump",
+          "path": "character/samurai/jump.png",
+          "step": [10,10,10,12,14,16,10,10,10,12,14,16]
+        },
+        {
+          "pose": "idle",
+          "path": "character/samurai/idle.png",
+          "step": [10,10,10,12,14,16]
+        },
+        {
+          "pose": "dead",
+          "path": "character/samurai/dead.png",
+          "step": [10,10,10]
+        },
+        {
+          "pose": "shield",
+          "path": "character/samurai/shield.png",
+          "step": [10,10]
+        },
+        {
+          "pose": "hurt",
+          "path": "character/samurai/hurt.png",
+          "step": [10,10]
+        }
+      ]
+    }
+  ],
+  "tileset": [
+    {
+      "name":"grassland" ,
+      "path": "tileset/92828/tileset.png",
+      "size": {"w": 32, "h": 32}
+    },
+    {
+      "name":"iron" ,
+      "path": "tileset/91702/tile/tileset.png",
+      "size": {"w": 32, "h": 32}
+    }
+  ]
+}
