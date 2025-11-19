@@ -1,0 +1,39 @@
+name: Build Client
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: build-client
+  cancel-in-progress: true
+
+jobs:
+  build-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git clone --depth 1 "https://x-access-token:${{ secrets.PONG_TOKEN }}@github.com/zhengkai/ruin-editor.git" main && \
+          git clone --branch gh-pages "https://x-access-token:${{ secrets.PONG_TOKEN }}@github.com/zhengkai/ruin-editor.git" main/gh-pages
+
+      - name: Build Pages
+        run: |
+          cd main/client \
+          && npm install \
+          && ./node_modules/vite/bin/vite.js build --outDir dist --base /ruin-editor/
+
+      - name: Save Pages
+        run: |
+          cd main && \
+          COMMIT=$(git rev-parse --short=8 HEAD) && \
+          TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') && \
+          sed -i "s#^// build:.*#// build: $TIME / $COMMIT#" client/dist/index.html && \
+          cd gh-pages && \
+          rm -rf assets && \
+          cp -R ../client/dist/* . && \
+          git config user.name "Github Actions Bot" && \
+          git config user.email "pong.bot@soulogic.com" && \
+          git commit --all --message="Update Pages" --amend || echo "No changes to commit" && \
+          git push --force
