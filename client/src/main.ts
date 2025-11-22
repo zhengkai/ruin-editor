@@ -5,7 +5,7 @@ import { tilesetComponent } from './component/tileset.ts';
 
 (async () => {
 	const a = await loadAsset();
-	console.log(a);
+	console.log('asset manifest', a);
 
 	const ht = await tilesetComponent(a.tileset.map(t => pb.Tileset.create(t)));
 	document.body.appendChild(ht);

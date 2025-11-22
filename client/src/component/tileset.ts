@@ -30,7 +30,6 @@ export async function tilesetComponent(li: pb.Tileset[]): Promise<HTMLDivElement
 				te.style.backgroundImage = `url(asset/${t.path})`;
 				te.style.backgroundPosition = `-${x}px -${y}px`;
 				box.appendChild(te);
-				console.log(te);
 			}
 		}
 		o.appendChild(box);

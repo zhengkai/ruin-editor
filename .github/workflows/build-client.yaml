@@ -15,14 +15,26 @@ jobs:
     steps:
       - name: Checkout
         run: |
-          git clone --depth 1 "https://x-access-token:${{ secrets.PONG_TOKEN }}@github.com/zhengkai/ruin-editor.git" main && \
-          git clone --branch gh-pages "https://x-access-token:${{ secrets.PONG_TOKEN }}@github.com/zhengkai/ruin-editor.git" main/gh-pages
+          git clone --depth 1 "https://github.com/zhengkai/ruin-editor.git" main && \
+          git clone --branch gh-pages "https://x-access-token:${{ secrets.PONG_TOKEN }}@github.com/zhengkai/ruin-editor.git" main/gh-pages && \
+          git clone --depth 1 "https://github.com/zhengkai/ruin.git" main/ruin && \
+          git clone --depth 1 "https://github.com/zhengkai/ruin-asset.git" main/asset
 
-      - name: Build Pages
+      - name: Init Client
         run: |
-          cd main/client \
-          && npm install \
-          && ./node_modules/vite/bin/vite.js build --outDir dist --base /ruin-editor/
+          cd main/client && \
+          npm install
+
+      - name: Protobuf
+        run: |
+          cd main && \
+          client/node_modules/protobufjs-cli/bin/pbjs -t static-module -w es6 --es6 --force-number -o client/src/pb/pb.js ruin/proto/*.proto && \
+          client/node_modules/protobufjs-cli/bin/pbts -o client/src/pb/pb.d.ts client/src/pb/pb.js
+
+      - name: Build
+        run: |
+          cd main/client && \
+          ./node_modules/vite/bin/vite.js build --outDir dist --base /ruin-editor/
 
       - name: Save Pages
         run: |
@@ -31,8 +43,9 @@ jobs:
           TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') && \
           sed -i "s#^// build:.*#// build: $TIME / $COMMIT#" client/dist/index.html && \
           cd gh-pages && \
-          rm -rf assets && \
-          cp -R ../client/dist/* . && \
+          rsync -av --delete --exclude='.git' ../asset . && \
+          rsync -av --delete --exclude='.git' --exclude='asset' ../client/dist/ . && \
+          git add --all . && \
           git config user.name "Github Actions Bot" && \
           git config user.email "pong.bot@soulogic.com" && \
           git commit --all --message="Update Pages" --amend || echo "No changes to commit" && \
