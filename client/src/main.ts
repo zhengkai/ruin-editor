@@ -1,5 +1,8 @@
 import './style/index.scss'
 import { setupCounter } from './counter.ts'
+import { loadRes } from './config.ts';
+
+loadRes();
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 <div>
