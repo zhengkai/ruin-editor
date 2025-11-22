@@ -1,0 +1,13 @@
+.tileset {
+	display: flex;
+	div {
+		display: flex;
+		flex-wrap: wrap;
+		div {
+			border: 1px solid #ccc;
+			&:hover {
+				border-color: red;
+			}
+		}
+	}
+}

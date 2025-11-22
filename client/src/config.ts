@@ -1,6 +1,6 @@
 import { pb } from './pb';
 
-export async function loadRes(): Promise<void> {
+export async function loadAsset(): Promise<pb.AssetManifest> {
 
 	let re = {};
 	try {
@@ -8,5 +8,5 @@ export async function loadRes(): Promise<void> {
 	} catch (_) {
 	}
 
-	console.log(pb.AssetManifest.fromObject(re));
+	return pb.AssetManifest.fromObject(re);
 };

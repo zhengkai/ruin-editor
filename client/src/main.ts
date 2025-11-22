@@ -1,19 +1,12 @@
 import './style/index.scss'
-import { setupCounter } from './counter.ts'
-import { loadRes } from './config.ts';
+import { pb } from './pb';
+import { loadAsset } from './config.ts';
+import { tilesetComponent } from './component/tileset.ts';
 
-loadRes();
+(async () => {
+	const a = await loadAsset();
+	console.log(a);
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<div>
-	<h1>Vite + TypeScript</h1>
-	<div class="card">
-		<button id="counter" type="button"></button>
-	</div>
-	<p class="read-the-docs">
-		Click on the Vite and TypeScript logos to learn more
-	</p>
-</div>
-`
-
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+	const ht = await tilesetComponent(a.tileset.map(t => pb.Tileset.create(t)));
+	document.body.appendChild(ht);
+})();
