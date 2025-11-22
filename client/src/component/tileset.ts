@@ -1,5 +1,24 @@
 import { pb } from '../pb';
 
+export interface Tile {
+	id: number;
+	pos: string;
+	w: number;
+	h: number;
+}
+
+export interface TileSet {
+	name: string;
+	url: string;
+	w: number;
+	h: number;
+	sizeW: number;
+	sizeH: number;
+	list: Tile[];
+}
+
+export const tilePool: { [key: string]: TileSet } = {};
+
 function getImageSize(url: string): Promise<{ w: number; h: number }> {
 	return new Promise((resolve, reject) => {
 		const img = new Image();
@@ -9,30 +28,64 @@ function getImageSize(url: string): Promise<{ w: number; h: number }> {
 	});
 }
 
-export async function tilesetComponent(li: pb.Tileset[]): Promise<HTMLDivElement> {
+export async function tilesetInit(li: pb.ITileset[]) {
+
+	for (const t of li.map(t => pb.Tileset.create(t))) {
+
+		let s = tilePool[t.name];
+		if (!s) {
+			s = {
+				name: t.name,
+				url: `asset/${t.path}`,
+				w: 0,
+				h: 0,
+				sizeW: 0,
+				sizeH: 0,
+				list: [{ id: 0, pos: '', w: 0, h: 0 }],
+			};
+			tilePool[t.name] = s;
+		}
+
+		const { w: sw, h: sh } = pb.Size.fromObject(t.size || { w: 32, h: 32 });
+		({ w: s.w, h: s.h } = await getImageSize(s.url));
+
+		let id = 0;
+		for (let y = 0; y < s.h; y += sh) {
+			for (let x = 0; x < s.w; x += sw) {
+				id++;
+				s.list.push({ id, pos: `-${x}px -${y}px`, w: sw, h: sh });
+			}
+		}
+	}
+};
+
+export async function tilesetComponent(): Promise<HTMLDivElement> {
 	const o = document.createElement('div');
 	o.classList.add('tileset');
 
-	for (const t of li) {
-		const { w, h } = await getImageSize(`asset/${t.path}`);
-		const { w: sw, h: sh } = pb.Size.fromObject(t.size || { w: 32, h: 32 });
+	Object.keys(tilePool).forEach(key => {
+		const s = tilePool[key];
 
 		const box = document.createElement('div');
-		box.style.width = `${w + 2 * (w / sw)}px`;
-		box.style.height = `${h + 2 * (w / sw)}px`;
+		box.style.width = `${s.w + 2 * (s.w / s.list[1].w)}px`;
+		box.style.height = `${s.h + 2 * (s.h / s.list[1].h)}px`;
 
-		for (let y = 0; y < h; y += sh) {
-			for (let x = 0; x < w; x += sw) {
-				const te = document.createElement('div');
-				te.classList.add('tile');
-				te.style.width = `${sw}px`;
-				te.style.height = `${sh}px`;
-				te.style.backgroundImage = `url(asset/${t.path})`;
-				te.style.backgroundPosition = `-${x}px -${y}px`;
-				box.appendChild(te);
+		for (const t of s.list) {
+			if (!t.id) {
+				continue;
 			}
+			const et = document.createElement('div');
+			et.classList.add('tile');
+			et.style.width = `${t.w}px`;
+			et.style.height = `${t.h}px`;
+			et.style.backgroundImage = `url("${s.url}")`;
+			et.style.backgroundPosition = t.pos;
+			box.appendChild(et);
+
+			et.dataset.id = t.id.toString();
+			et.dataset.name = s.name;
 		}
 		o.appendChild(box);
-	}
+	});
 	return o;
 }

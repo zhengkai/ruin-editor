@@ -1,9 +1,10 @@
 .tileset {
 	display: flex;
-	div {
+	> div {
+		margin: 16px;
 		display: flex;
 		flex-wrap: wrap;
-		div {
+		> div {
 			border: 1px solid #ccc;
 			&:hover {
 				border-color: red;

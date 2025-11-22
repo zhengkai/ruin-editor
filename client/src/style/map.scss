@@ -1,0 +1,15 @@
+.map {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 16px;
+	> div {
+		width: 32px;
+		height: 32px;
+		background-repeat: no-repeat;
+		border: 1px solid #fff;
+		background-color: #f0f0f0;
+		&.hover {
+			background-color: red;
+		}
+	}
+}
