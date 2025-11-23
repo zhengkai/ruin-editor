@@ -48,11 +48,10 @@ export const setAllDrag = (selector: string, targetSelector: string = ".map > di
 				el.removeEventListener('pointerup', pointerUp);
 
 				if (currentHover) {
-					console.log(`Dropped: ${d.name}.${d.id} on `, currentHover);
+					currentHover.dispatchEvent(new CustomEvent("tilePut", { detail: { name: d.name, id: d.id } }));
+					currentHover.classList.remove('hover');
+					currentHover = null;
 				}
-
-				currentHover?.classList.remove('hover');
-				currentHover = null;
 				ghost?.remove();
 				ghost = null;
 			};

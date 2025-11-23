@@ -59,6 +59,24 @@ export async function tilesetInit(li: pb.ITileset[]) {
 	}
 };
 
+export async function setTileBg(name: string, id: number, e: HTMLDivElement) {
+
+	const s = tilePool[name];
+	if (!s) {
+		console.warn(`unknown tileset ${name}`);
+		return;
+	}
+
+	const t = s.list[id];
+	if (!t) {
+		console.warn(`unknown tile ${name}.${id}`);
+		return;
+	}
+
+	e.style.backgroundImage = `url("${s.url}")`;
+	e.style.backgroundPosition = t.pos;
+}
+
 export async function tilesetComponent(): Promise<HTMLDivElement> {
 	const o = document.createElement('div');
 	o.classList.add('tileset');

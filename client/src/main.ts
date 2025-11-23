@@ -2,6 +2,7 @@ import './style/index.scss'
 import { loadAsset } from './config.ts';
 import { tilesetInit, tilePool, tilesetComponent } from './component/tileset.ts';
 import { mapInit, mapComponent } from './component/map.ts';
+import { opComponent } from './component/op.ts';
 import { setAllDrag } from './effect/drag.ts';
 
 (async () => {
@@ -20,6 +21,9 @@ import { setAllDrag } from './effect/drag.ts';
 
 	const ht = await tilesetComponent();
 	document.body.appendChild(ht);
+
+	const op = opComponent();
+	ht.appendChild(op);
 
 	setAllDrag(".tile")
 })();

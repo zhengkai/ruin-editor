@@ -1,3 +1,5 @@
+import { setTileBg } from './tileset.ts';
+
 export interface CellTile {
 	name: string;
 	id: number;
@@ -36,6 +38,13 @@ export function mapInit(w: number, h: number) {
 	mapPool.h = h;
 }
 
+export const dumpMap = () => {
+	const pool = JSON.parse(JSON.stringify(mapPool));
+	pool.list = pool.list.filter((c: MapCell) => c.tile);
+	console.log(pool);
+	console.log(mapPool);
+}
+
 export function mapComponent(): HTMLDivElement {
 
 	const m = mapPool;
@@ -43,11 +52,20 @@ export function mapComponent(): HTMLDivElement {
 	o.classList.add('map');
 	o.style.width = `${(m.pw + 2) * m.w}px`;
 	o.style.height = `${(m.ph + 2) * m.h}px`;
-	for (let y = 0; y < m.h; y++) {
-		for (let x = 0; x < m.w; x++) {
-			const et = document.createElement('div');
-			o.appendChild(et);
-		}
+
+	for (const p of mapPool.list) {
+		const et = document.createElement('div');
+		const tilePut = (e: CustomEvent<{ name: string; id: number }>) => {
+			const name = e.detail.name;
+			const id = e.detail.id | 0;
+			et.dataset.name = name;
+			et.dataset.id = id.toString();
+			setTileBg(name, id, et);
+			p.tile = { name, id };
+			console.log(`${e.detail.name}.${e.detail.id} on ${p.id}`);
+		};
+		et.addEventListener('tilePut', tilePut as EventListener);
+		o.appendChild(et);
 	}
 	return o;
 }
