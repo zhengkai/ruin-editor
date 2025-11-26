@@ -11,7 +11,7 @@ import { setAllDrag } from './effect/drag.ts';
 	console.log('asset manifest', a);
 
 	await tilesetInit(a.tileset);
-	mapInit(80, 20);
+	await mapInit(80, 20);
 
 	console.log(tilePool);
 

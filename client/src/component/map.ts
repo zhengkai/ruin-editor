@@ -1,57 +1,57 @@
+import { pb } from '../pb';
 import { setTileBg } from './tileset.ts';
 
-export interface CellTile {
-	name: string;
-	id: number;
-}
+const cellSize = 32;
 
-export interface MapCell {
-	id: number;
-	tile?: CellTile;
-}
+export const mapPool = pb.Map.fromObject({});
 
-export interface RuinMap {
-	list: MapCell[];
-	w: number;
-	h: number;
-	pw: number;
-	ph: number;
-}
+export const mapInit = async (w: number, h: number) => {
 
-export const mapPool: RuinMap = {
-	list: [],
-	w: 0,
-	h: 0,
-	pw: 32,
-	ph: 32,
-};
+	let d: pb.Map | null = null;
+	const p: { [key: number]: pb.MapCell } = {};
 
-export function mapInit(w: number, h: number) {
+	try {
+		const s = await (await fetch('asset/map.json')).json();
+		d = pb.Map.fromObject(s);
+		w = d.w;
+		h = d.h;
+		for (const c of d.list) {
+			if (!c?.id || !c?.tile) {
+				continue;
+			}
+			p[c.id] = pb.MapCell.fromObject(c);
+		}
+	} catch (x) {
+	}
+	console.log(p);
+
+	mapPool.w = w;
+	mapPool.h = h;
+	mapPool.list.length = 0;
+
 	let id = 0;
 	for (let y = 0; y < h; y++) {
 		for (let x = 0; x < w; x++) {
-			mapPool.list.push({ id });
+			mapPool.list.push(p[id] || pb.MapCell.fromObject({ id }));
 			id++;
 		}
 	}
-	mapPool.w = w;
-	mapPool.h = h;
+	console.log('mapPool', mapPool);
 }
 
 export const dumpMap = () => {
-	const pool = JSON.parse(JSON.stringify(mapPool));
-	pool.list = pool.list.filter((c: MapCell) => c.tile);
-	console.log(pool);
-	console.log(mapPool);
+	const pool = pb.Map.fromObject(mapPool.toJSON());
+	pool.list = pool.list.filter((c: pb.IMapCell) => c?.tile);
+	return JSON.stringify(pool.toJSON());
 }
 
-export function mapComponent(): HTMLDivElement {
+export const mapComponent = () => {
 
 	const m = mapPool;
 	const o = document.createElement('div');
 	o.classList.add('map');
-	o.style.width = `${(m.pw + 2) * m.w}px`;
-	o.style.height = `${(m.ph + 2) * m.h}px`;
+	o.style.width = `${(cellSize + 2) * m.w}px`;
+	o.style.height = `${(cellSize + 2) * m.h}px`;
 
 	for (const p of mapPool.list) {
 		const et = document.createElement('div');
@@ -61,10 +61,14 @@ export function mapComponent(): HTMLDivElement {
 			et.dataset.name = name;
 			et.dataset.id = id.toString();
 			setTileBg(name, id, et);
-			p.tile = { name, id };
-			console.log(`${e.detail.name}.${e.detail.id} on ${p.id}`);
+			p.tile = pb.MapCellTile.fromObject({ name, id });
+			console.log(`${name}.${id} on ${p.id}`);
 		};
 		et.addEventListener('tilePut', tilePut as EventListener);
+		if (p.tile) {
+			const tile = pb.MapCellTile.fromObject(p.tile);
+			tilePut(new CustomEvent('tilePut', { detail: { name: tile.name, id: tile.id } }));
+		}
 		o.appendChild(et);
 	}
 	return o;
