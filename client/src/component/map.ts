@@ -55,10 +55,10 @@ export const mapComponent = () => {
 
 	for (const p of mapPool.list) {
 		const et = document.createElement('div');
-		const tilePut = (e: CustomEvent<{ name: string; id: number }>) => {
+		const tilePut = (e: CustomEvent<{ name: pb.Tileset.Name; id: number }>) => {
 			const name = e.detail.name;
 			const id = e.detail.id | 0;
-			et.dataset.name = name;
+			et.dataset.name = name.toString();
 			et.dataset.id = id.toString();
 			setTileBg(name, id, et);
 			p.tile = pb.MapCellTile.fromObject({ name, id });

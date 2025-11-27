@@ -8,7 +8,7 @@ export interface Tile {
 }
 
 export interface TileSet {
-	name: string;
+	name: pb.Tileset.Name;
 	url: string;
 	w: number;
 	h: number;
@@ -17,7 +17,7 @@ export interface TileSet {
 	list: Tile[];
 }
 
-export const tilePool: { [key: string]: TileSet } = {};
+export const tilePool = new Map<pb.Tileset.Name, TileSet>();
 
 function getImageSize(url: string): Promise<{ w: number; h: number }> {
 	return new Promise((resolve, reject) => {
@@ -32,7 +32,7 @@ export async function tilesetInit(li: pb.ITileset[]) {
 
 	for (const t of li.map(t => pb.Tileset.create(t))) {
 
-		let s = tilePool[t.name];
+		let s = tilePool.get(t.name);
 		if (!s) {
 			s = {
 				name: t.name,
@@ -43,7 +43,7 @@ export async function tilesetInit(li: pb.ITileset[]) {
 				sizeH: 0,
 				list: [{ id: 0, pos: '', w: 0, h: 0 }],
 			};
-			tilePool[t.name] = s;
+			tilePool.set(t.name, s);
 		}
 
 		const { w: sw, h: sh } = pb.Size.fromObject(t.size || { w: 32, h: 32 });
@@ -59,9 +59,9 @@ export async function tilesetInit(li: pb.ITileset[]) {
 	}
 };
 
-export async function setTileBg(name: string, id: number, e: HTMLDivElement) {
+export async function setTileBg(name: pb.Tileset.Name, id: number, e: HTMLDivElement) {
 
-	const s = tilePool[name];
+	const s = tilePool.get(name);
 	if (!s) {
 		console.warn(`unknown tileset ${name}`);
 		return;
@@ -81,8 +81,7 @@ export async function tilesetComponent(): Promise<HTMLDivElement> {
 	const o = document.createElement('div');
 	o.classList.add('tileset');
 
-	Object.keys(tilePool).forEach(key => {
-		const s = tilePool[key];
+	for (const [k, s] of tilePool) {
 
 		const box = document.createElement('div');
 		box.style.width = `${s.w + 2 * (s.w / s.list[1].w)}px`;
@@ -101,9 +100,9 @@ export async function tilesetComponent(): Promise<HTMLDivElement> {
 			box.appendChild(et);
 
 			et.dataset.id = t.id.toString();
-			et.dataset.name = s.name;
+			et.dataset.name = k.toString();
 		}
 		o.appendChild(box);
-	});
+	};
 	return o;
 }
