@@ -55,8 +55,10 @@ export const mapComponent = () => {
 
 	for (const p of mapPool.list) {
 		const et = document.createElement('div');
+		const id = p?.id || 0;
+		et.title = `id: ${id}, x: ${id % m.w}, y: ${m.h - Math.floor(id / m.w)}`;
 		const tilePut = (e: CustomEvent<{ name: pb.Tileset.Name; id: number }>) => {
-			const name = e.detail.name;
+			const name = e.detail.name | 0;
 			const id = e.detail.id | 0;
 			et.dataset.name = name.toString();
 			et.dataset.id = id.toString();

@@ -17,7 +17,6 @@ import { setAllDrag } from './effect/drag.ts';
 
 	const hm = mapComponent();
 	document.body.appendChild(hm);
-	console.log(hm);
 
 	const ht = await tilesetComponent();
 	document.body.appendChild(ht);
