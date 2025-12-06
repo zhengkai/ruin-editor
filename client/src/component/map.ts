@@ -56,7 +56,7 @@ export const mapComponent = () => {
 	for (const p of mapPool.list) {
 		const et = document.createElement('div');
 		const id = p?.id || 0;
-		et.title = `id: ${id}, x: ${id % m.w}, y: ${m.h - Math.floor(id / m.w)}`;
+		et.title = `id: ${id}, x: ${id % m.w}, y: ${m.h - 1 - Math.floor(id / m.w)}`;
 		const tilePut = (e: CustomEvent<{ name: pb.Tileset.Name; id: number }>) => {
 			const name = e.detail.name | 0;
 			const id = e.detail.id | 0;
@@ -66,6 +66,14 @@ export const mapComponent = () => {
 			p.tile = pb.MapCellTile.fromObject({ name, id });
 			console.log(`${name}.${id} on ${p.id}`);
 		};
+		et.addEventListener('contextmenu', e => {
+			Object.keys(et.dataset).forEach(k => delete et.dataset[k]);
+			et.style.backgroundImage = '';
+			p.tile = null;
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		});
 		et.addEventListener('tilePut', tilePut as EventListener);
 		if (p.tile) {
 			const tile = pb.MapCellTile.fromObject(p.tile);
@@ -73,5 +81,10 @@ export const mapComponent = () => {
 		}
 		o.appendChild(et);
 	}
-	return o;
+
+	const box = document.createElement('div');
+	box.classList.add('map-box');
+	box.appendChild(o);
+
+	return box;
 }
