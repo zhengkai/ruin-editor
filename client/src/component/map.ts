@@ -1,42 +1,34 @@
 import { pb } from '../pb';
+import { htmlNew } from '../util/html.ts';
 import { setTileBg } from './tileset.ts';
 
 const cellSize = 32;
 
-export const mapPool = pb.Map.fromObject({});
+export let mapPool = pb.Map.fromObject({});
 
-export const mapInit = async (w: number, h: number) => {
+export const mapInit = async (m: pb.IMap) => {
 
-	let d: pb.Map | null = null;
+	let d = pb.Map.fromObject(m);
 	const p: { [key: number]: pb.MapCell } = {};
 
-	try {
-		const s = await (await fetch('asset/map.json')).json();
-		d = pb.Map.fromObject(s);
-		w = d.w;
-		h = d.h;
-		for (const c of d.list) {
-			if (!c?.id || !c?.tile) {
-				continue;
-			}
-			p[c.id] = pb.MapCell.fromObject(c);
+	for (const c of d.list) {
+		if (!c?.tile) {
+			continue;
 		}
-	} catch (x) {
+		p[c?.id || 0] = pb.MapCell.fromObject(c);
 	}
-	console.log(p);
 
-	mapPool.w = w;
-	mapPool.h = h;
+	mapPool = pb.Map.fromObject(m);
 	mapPool.list.length = 0;
 
 	let id = 0;
-	for (let y = 0; y < h; y++) {
-		for (let x = 0; x < w; x++) {
+	for (let y = 0; y < d.h; y++) {
+		for (let x = 0; x < d.w; x++) {
 			mapPool.list.push(p[id] || pb.MapCell.fromObject({ id }));
 			id++;
 		}
 	}
-	console.log('mapPool', mapPool);
+	console.log('mapPool', d.name, mapPool);
 }
 
 export const dumpMap = () => {
@@ -48,13 +40,12 @@ export const dumpMap = () => {
 export const mapComponent = () => {
 
 	const m = mapPool;
-	const o = document.createElement('div');
-	o.classList.add('map');
+	const o = htmlNew('div', 'map');
 	o.style.width = `${(cellSize + 2) * m.w}px`;
 	o.style.height = `${(cellSize + 2) * m.h}px`;
 
 	for (const p of mapPool.list) {
-		const et = document.createElement('div');
+		const et = htmlNew('div');
 		const id = p?.id || 0;
 		et.title = `id: ${id}, x: ${id % m.w}, y: ${m.h - 1 - Math.floor(id / m.w)}`;
 		const tilePut = (e: CustomEvent<{ name: pb.Tileset.Name; id: number }>) => {
@@ -64,7 +55,7 @@ export const mapComponent = () => {
 			et.dataset.id = id.toString();
 			setTileBg(name, id, et);
 			p.tile = pb.MapCellTile.fromObject({ name, id });
-			console.log(`${name}.${id} on ${p.id}`);
+			// console.log(`${name}.${id} on ${p.id}`);
 		};
 		et.addEventListener('contextmenu', e => {
 			Object.keys(et.dataset).forEach(k => delete et.dataset[k]);
@@ -82,9 +73,5 @@ export const mapComponent = () => {
 		o.appendChild(et);
 	}
 
-	const box = document.createElement('div');
-	box.classList.add('map-box');
-	box.appendChild(o);
-
-	return box;
+	return o;
 }

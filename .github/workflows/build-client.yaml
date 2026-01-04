@@ -20,7 +20,13 @@ jobs:
           git clone --depth 1 "https://github.com/zhengkai/ruin-editor.git" main && \
           git clone --branch gh-pages "https://x-access-token:${{ secrets.PONG_TOKEN }}@github.com/zhengkai/ruin-editor.git" main/gh-pages && \
           git clone --depth 1 "https://github.com/zhengkai/ruin.git" main/ruin && \
-          git clone --depth 1 "https://github.com/zhengkai/ruin-asset.git" main/asset
+          git clone --depth 1 "https://github.com/zhengkai/ruin-asset.git" main/ruin/asset
+
+      - name: Asset
+        run: |
+          cd main/ruin && \
+          mkdir -p build/Release && \
+          ./misc/copy-asset.mjs
 
       - name: Init Client
         run: |
@@ -38,6 +44,7 @@ jobs:
           cd main/client && \
           ./node_modules/vite/bin/vite.js build --outDir dist --base /ruin-editor/
 
+
       - name: Save Pages
         run: |
           cd main && \
@@ -45,7 +52,7 @@ jobs:
           TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') && \
           sed -i "s#^// build:.*#// build: $TIME / $COMMIT#" client/dist/index.html && \
           cd gh-pages && \
-          rsync -av --delete --exclude='.git' ../asset . && \
+          rsync -av --delete --exclude='.git' ../ruin/build/Release/asset . && \
           rsync -av --delete --exclude='.git' --exclude='asset' ../client/dist/ . && \
           git add --all . && \
           git config user.name "Github Actions Bot" && \

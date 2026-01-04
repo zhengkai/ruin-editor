@@ -1,5 +1,7 @@
-.titleset > div.op {
+.tileset > div.op {
 	display: block;
-	button {
+	button, select {
+		display: block;
+		margin: 0 0 16px 0;
 	}
 }

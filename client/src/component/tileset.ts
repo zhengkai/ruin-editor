@@ -1,4 +1,5 @@
 import { pb } from '../pb';
+import { htmlNew } from '../util/html.ts';
 
 export interface Tile {
 	id: number;
@@ -78,12 +79,11 @@ export async function setTileBg(name: pb.Tileset.Name, id: number, e: HTMLDivEle
 }
 
 export async function tilesetComponent(): Promise<HTMLDivElement> {
-	const o = document.createElement('div');
-	o.classList.add('tileset');
+	const o = htmlNew('div', 'tileset');
 
 	for (const [k, s] of tilePool) {
 
-		const box = document.createElement('div');
+		const box = htmlNew('div');
 		box.style.width = `${s.w + 2 * (s.w / s.list[1].w)}px`;
 		box.style.height = `${s.h + 2 * (s.h / s.list[1].h)}px`;
 
@@ -91,8 +91,7 @@ export async function tilesetComponent(): Promise<HTMLDivElement> {
 			if (!t.id) {
 				continue;
 			}
-			const et = document.createElement('div');
-			et.classList.add('tile');
+			const et = htmlNew('div', 'tile');
 			et.style.width = `${t.w}px`;
 			et.style.height = `${t.h}px`;
 			et.style.backgroundImage = `url("${s.url}")`;
