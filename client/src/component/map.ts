@@ -11,7 +11,7 @@ export const mapInit = async (m: pb.IMap) => {
 	let d = pb.Map.fromObject(m);
 	const p: { [key: number]: pb.MapCell } = {};
 
-	for (const c of d.list) {
+	for (const c of d.terrain) {
 		if (!c?.tile) {
 			continue;
 		}
@@ -19,22 +19,22 @@ export const mapInit = async (m: pb.IMap) => {
 	}
 
 	mapPool = pb.Map.fromObject(m);
-	mapPool.list.length = 0;
+	mapPool.terrain.length = 0;
 
 	let id = 0;
 	for (let y = 0; y < d.h; y++) {
 		for (let x = 0; x < d.w; x++) {
-			mapPool.list.push(p[id] || pb.MapCell.fromObject({ id }));
+			mapPool.terrain.push(p[id] || pb.MapCell.fromObject({ id }));
 			id++;
 		}
 	}
 	console.log('mapPool', d.name, mapPool);
 }
 
-export const dumpMap = () => {
+export const dumpMapTerrain = () => {
 	const pool = pb.Map.fromObject(mapPool.toJSON());
-	pool.list = pool.list.filter((c: pb.IMapCell) => c?.tile);
-	return JSON.stringify(pool.toJSON());
+	pool.terrain = pool.terrain.filter((c: pb.IMapCell) => c?.tile);
+	return JSON.stringify(pool.terrain);
 }
 
 export const mapComponent = () => {
@@ -44,7 +44,7 @@ export const mapComponent = () => {
 	o.style.width = `${(cellSize + 2) * m.w}px`;
 	o.style.height = `${(cellSize + 2) * m.h}px`;
 
-	for (const p of mapPool.list) {
+	for (const p of mapPool.terrain) {
 		const et = htmlNew('div');
 		const id = p?.id || 0;
 		et.title = `id: ${id}, x: ${id % m.w}, y: ${m.h - 1 - Math.floor(id / m.w)}`;

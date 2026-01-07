@@ -1,6 +1,6 @@
 import { htmlNew } from '../util/html.ts';
 import { pb } from '../pb';
-import { dumpMap } from './map.ts';
+import { dumpMapTerrain } from './map.ts';
 
 const download = (content: string, filename: string, contentType: string = 'application/json') => {
 
@@ -20,10 +20,10 @@ export function opComponent(ml: pb.IMap[], mapCb: (idx: number) => void): HTMLDi
 	const o = htmlNew('div', 'op');
 
 	const dl = htmlNew('button', 'download');
-	dl.textContent = 'Download';
+	dl.textContent = 'Download Terrain';
 	dl.onclick = () => {
-		const s = dumpMap();
-		download(s, 'map.json');
+		const terrain = dumpMapTerrain();
+		download(terrain, `terrain.json`);
 	}
 	o.appendChild(dl);
 
