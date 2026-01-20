@@ -21,11 +21,10 @@ export const mapInit = async (m: pb.IMap) => {
 	mapPool = pb.Map.fromObject(m);
 	mapPool.terrain.length = 0;
 
-	let id = 0;
-	for (let y = 0; y < d.h; y++) {
+	for (let y = d.h - 1; y >= 0; y--) {
 		for (let x = 0; x < d.w; x++) {
+			const id = y * d.w + x;
 			mapPool.terrain.push(p[id] || pb.MapCell.fromObject({ id }));
-			id++;
 		}
 	}
 	console.log('mapPool', d.name, mapPool);
@@ -47,7 +46,7 @@ export const mapComponent = () => {
 	for (const p of mapPool.terrain) {
 		const et = htmlNew('div');
 		const id = p?.id || 0;
-		et.title = `id: ${id}, x: ${id % m.w}, y: ${m.h - 1 - Math.floor(id / m.w)}`;
+		et.title = `id: ${id}, x: ${id % m.w}, y: ${Math.floor(id / m.w)}`;
 		const tilePut = (e: CustomEvent<{ name: pb.Tileset.Name; id: number }>) => {
 			const name = e.detail.name | 0;
 			const id = e.detail.id | 0;
