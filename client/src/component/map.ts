@@ -36,6 +36,47 @@ export const dumpMapTerrain = () => {
 	return JSON.stringify(pool.terrain);
 }
 
+const createTile = (p: pb.IMapCell) => {
+
+	const m = mapPool;
+
+	const et = htmlNew('div');
+	const id = p?.id || 0;
+	et.title = `id: ${id}, x: ${id % m.w}, y: ${Math.floor(id / m.w)}`;
+	const tilePut = (e: CustomEvent<{ name: pb.Tileset.Name; id: number }>) => {
+		const name = e.detail.name | 0;
+		const id = e.detail.id | 0;
+		et.dataset.name = name.toString();
+		et.dataset.id = id.toString();
+		setTileBg(name, id, et);
+		p.tile = pb.MapCellTile.fromObject({ name, id });
+		// console.log(`${name}.${id} on ${p.id}`);
+	};
+
+	for (const tr of m.trigger) {
+		if (tr?.id === id) {
+			et.classList.add('trigger');
+			return et;
+		}
+	};
+
+	et.addEventListener('contextmenu', e => {
+		Object.keys(et.dataset).forEach(k => delete et.dataset[k]);
+		et.style.backgroundImage = '';
+		p.tile = null;
+		e.preventDefault();
+		e.stopPropagation();
+		return false;
+	});
+	et.addEventListener('tilePut', tilePut as EventListener);
+	if (p.tile) {
+		const tile = pb.MapCellTile.fromObject(p.tile);
+		tilePut(new CustomEvent('tilePut', { detail: { name: tile.name, id: tile.id } }));
+	}
+
+	return et;
+}
+
 export const mapComponent = () => {
 
 	const m = mapPool;
@@ -44,32 +85,8 @@ export const mapComponent = () => {
 	o.style.height = `${(cellSize + 2) * m.h}px`;
 
 	for (const p of mapPool.terrain) {
-		const et = htmlNew('div');
-		const id = p?.id || 0;
-		et.title = `id: ${id}, x: ${id % m.w}, y: ${Math.floor(id / m.w)}`;
-		const tilePut = (e: CustomEvent<{ name: pb.Tileset.Name; id: number }>) => {
-			const name = e.detail.name | 0;
-			const id = e.detail.id | 0;
-			et.dataset.name = name.toString();
-			et.dataset.id = id.toString();
-			setTileBg(name, id, et);
-			p.tile = pb.MapCellTile.fromObject({ name, id });
-			// console.log(`${name}.${id} on ${p.id}`);
-		};
-		et.addEventListener('contextmenu', e => {
-			Object.keys(et.dataset).forEach(k => delete et.dataset[k]);
-			et.style.backgroundImage = '';
-			p.tile = null;
-			e.preventDefault();
-			e.stopPropagation();
-			return false;
-		});
-		et.addEventListener('tilePut', tilePut as EventListener);
-		if (p.tile) {
-			const tile = pb.MapCellTile.fromObject(p.tile);
-			tilePut(new CustomEvent('tilePut', { detail: { name: tile.name, id: tile.id } }));
-		}
-		o.appendChild(et);
+
+		o.appendChild(createTile(p));
 	}
 
 	return o;
