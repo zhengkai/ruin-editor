@@ -26,7 +26,7 @@ jobs:
         run: |
           cd main/ruin && \
           mkdir -p build/Release && \
-          ./misc/copy-asset.mjs
+          ./misc/asset/copy.mjs
 
       - name: Init Client
         run: |
