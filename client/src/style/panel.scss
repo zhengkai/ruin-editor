@@ -1,0 +1,13 @@
+div.panel {
+	display: flex;
+	flex-direction: row;
+	position: fixed;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 8px;
+	background: #fff;
+	margin: 0 auto;
+	&.hidden {
+		display: none;
+	}
+}

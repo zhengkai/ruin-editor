@@ -46,3 +46,23 @@ export function opComponent(ml: pb.IMap[], mapCb: (idx: number) => void): HTMLDi
 
 	return o;
 }
+
+export const bindHotKey = (panel: HTMLElement) => {
+	window.addEventListener("keydown", (e: KeyboardEvent) => {
+
+		const target = e.target as HTMLElement;
+		if (!target) {
+			return;
+		}
+
+		const tag = target.tagName;
+		if (tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable) {
+			return;
+		}
+
+		if (e.key.toLowerCase() === "f") {
+			e.preventDefault();
+			panel.classList.toggle("hidden");
+		}
+	});
+}

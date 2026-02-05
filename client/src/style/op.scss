@@ -1,4 +1,6 @@
-.tileset > div.op {
+div.panel > div.op {
+	user-select: none;
+	margin: 16px;
 	display: block;
 	button, select {
 		display: block;
