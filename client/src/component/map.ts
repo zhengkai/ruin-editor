@@ -53,13 +53,6 @@ const createTile = (p: pb.IMapCell) => {
 		// console.log(`${name}.${id} on ${p.id}`);
 	};
 
-	for (const tr of m.trigger) {
-		if (tr?.id === id) {
-			et.classList.add('trigger');
-			return et;
-		}
-	};
-
 	et.addEventListener('contextmenu', e => {
 		Object.keys(et.dataset).forEach(k => delete et.dataset[k]);
 		et.style.backgroundImage = '';
