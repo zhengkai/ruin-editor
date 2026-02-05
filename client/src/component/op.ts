@@ -34,7 +34,7 @@ export function opComponent(ml: pb.IMap[], mapCb: (idx: number) => void): HTMLDi
 		if (i === 0) {
 			option.selected = true;
 		}
-		option.textContent = `${v.name}`;
+		option.textContent = `${pb.Map.Name[v.name!]}`;
 		select.appendChild(option);
 	});
 	select.onchange = () => {
